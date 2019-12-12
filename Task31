@@ -1,0 +1,70 @@
+import sys
+
+# Function definitions
+
+# Store new point function, parameters, two lists
+def Addnewpoint(ListA,number):
+        ListA.append(number)
+
+# Query function, parameters, three lists
+def Query(ListA, StartingPoint, EndPoint):
+    results = [] # Initialise results
+    for element in ListA:
+        if WithinRange(element,StartingPoint,EndPoint,0): 
+            results.append(str(element).replace(',','')) 
+            # Note that our results array contains string as elements, 
+            # To match the desired output
+
+    # Print results
+    for i in results:
+        print (i, end=" ")
+    print
+
+
+# Function to recursively check if the given point is in the rectangle
+# Takes in 3 lists, that is points, and a number which indicates the current axis to check
+# Returns True or False
+def WithinRange(PointA, PointB, PointC, i):
+    if int(PointA[i]) >= int(PointB[i]) and int(PointA[i]) <= int(PointC[i]):
+        i = i + 1
+        if i == (len(PointA)): # Base case
+            return True
+        else: # If the point is within the range, call the function again on the next axis
+            return (True and WithinRange(PointA, PointB, PointC, i))
+    else: 
+        return False
+
+
+# Initialisation 
+ListOfPoints = [] # Array for the input numbers
+
+# Read the first line
+FirstLine = sys.stdin.readline()
+info = [int(i) for i in FirstLine.strip().split()]
+NumberOfElements = info[0]
+NumberOfDimensions = info[1]
+NumberOfQueries = info[2]
+
+# Read numbers
+for i in range(0,NumberOfElements):
+    line = sys.stdin.readline()
+    input_point = [int(i) for i in line.strip().split()]
+    Addnewpoint(ListOfPoints,input_point)
+
+
+# Read queries
+for i in range(0,NumberOfQueries):
+    # String manipulations
+    line = sys.stdin.readline()
+    line = line.strip()
+    line = line.replace('[','')
+    line = line.replace(']','')
+    input_point = line.split(' ')
+    Start = []
+    for i in range(0,NumberOfDimensions):
+        Start.append(int(input_point[i])) 
+    End = []
+    for i in range(NumberOfDimensions,2*NumberOfDimensions):
+        End.append(int(input_point[i]))
+    # Function call
+    Query(ListOfPoints,Start,End)

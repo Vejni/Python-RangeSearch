@@ -1,0 +1,81 @@
+import sys
+from operator import itemgetter
+
+# Node class definition
+class Node(object):
+
+    def __init__(self, value):
+        self.value = value  #Splitting value
+        self.left = None    #left child
+        self.right = None   #right child
+        Nodes.append(self)  #automatically append to Nodes array
+    
+    def getval(self):
+        return self.value
+
+    # Function to print the tree, does depth first traversal
+    def printTree(self):  
+        print (self.getval())
+        if self.left:
+            self.left.printTree()
+        if self.right:
+            self.right.printTree()
+        
+
+# Function definitions
+
+# Store new point function, parameters, two lists
+def Addnewpoint(ListA,number):
+        ListA.append(number)
+
+# Returns the median POINT of a list, if even elements, returns the bigger one as I took the picture as an example
+# Sort list before use
+def median(lst):
+    lstLen = len(lst)
+    if lstLen == 0:
+        return None
+    index = (lstLen - 1) // 2
+    if (lstLen % 2):
+        return (lst[index])
+    else:
+        return (lst[index + 1])
+
+# Function to build the tree, returns the root at the end, takes in a list of points and 0 in the beginning
+def BuildKDTree(P,d):
+    if len(P) == 0:
+        return None
+    elif len(P) == 1:
+        return Node(P[0])
+    axis = d % NumberOfDimensions
+    P.sort(key=itemgetter(axis))            # Sort the list on the desired axis    
+    MedPoint = median(P)                    # Get the median on that axis
+    x = int(len(P)/2)                       # Rounded down middle
+    Vleft = BuildKDTree(P[:(x)],(d+1))      # None of the function calls include the splitting node in their arrays, because it would loop forever
+    Vright = BuildKDTree(P[(x+1):],(d+1))
+    MedianPoint = Node(MedPoint)
+    MedianPoint.left = Vleft
+    MedianPoint.right = Vright
+    return MedianPoint
+
+
+# Initialisation 
+ListOfPoints = [] # Array for the input numbers
+Nodes = [] # Array to store created nodes
+
+# Read the first line
+FirstLine = sys.stdin.readline()
+info = [int(i) for i in FirstLine.strip().split()]
+NumberOfElements = info[0]
+NumberOfDimensions = info[1]
+NumberOfQueries = info[2]
+
+# Read numbers
+for i in range(0,NumberOfElements):
+    line = sys.stdin.readline()
+    input_point = [int(i) for i in line.strip().split()]
+    Addnewpoint(ListOfPoints,input_point)
+
+# Create tree
+X = BuildKDTree(ListOfPoints,0)
+# Print tree, depth first order
+X.printTree()

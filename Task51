@@ -1,0 +1,182 @@
+import sys
+from operator import itemgetter
+
+# Node class definition
+class Node(object):
+
+    def __init__(self, value):
+        self.value = value  #Splitting value
+        self.left = None    #left child
+        self.right = None   #right child
+        Nodes.append(self)  #automatically append to Nodes array
+    
+    def getval(self):
+        return self.value
+    
+    # Function to return a list of all the offsprings of a node
+    def getoffsprings(self):
+        result = []
+        stack = [self]
+        node = None
+        while stack:
+            if node is None:
+                node = stack.pop()
+            if node is not None:
+                result.append(node.value)
+                stack.append(node.right)
+                node = node.left
+        return result
+
+    # Get the leftmost offspring
+    def getleftmost(self):
+        if not(self.left):
+            return self.value
+        else:
+            return self.left.getleftmost()
+    
+    # Get rightmost offspring
+    def getrightmost(self):   
+        if not(self.right):
+            return self.value
+        else:
+            return self.right.getrightmost()
+
+# Function definitions
+
+# Store new point function, parameters, two lists
+def Addnewpoint(ListA,number):
+        ListA.append(number)
+
+# Returns the median POINT of a list, if even elements, returns the bigger one as I took the picture as an example
+# Sort list before use
+def median(lst):
+    lstLen = len(lst)
+    if lstLen == 0:
+        return None
+    index = (lstLen - 1) // 2
+    if (lstLen % 2):
+        return (lst[index])
+    else:
+        return (lst[index + 1])
+
+# Function to build the tree, returns the root at the end, takes in a list of points and 0 in the beginning
+def BuildKDTree(P,d):
+    if len(P) == 0:
+        return None
+    elif len(P) == 1:
+        return Node(P[0])
+    axis = d % NumberOfDimensions
+    P.sort(key=itemgetter(axis))            # Sort the list on the desired axis    
+    MedPoint = median(P)                    # Get the median on that axis
+    x = int(len(P)/2)                       # Rounded down middle
+    Vleft = BuildKDTree(P[:(x)],(d+1))      # None of the function calls include the splitting node in their arrays, because it would loop forever
+    Vright = BuildKDTree(P[(x+1):],(d+1))
+    MedianPoint = Node(MedPoint)
+    MedianPoint.left = Vleft
+    MedianPoint.right = Vright
+    return MedianPoint
+
+
+# Function to recursively check if the given point is in the rectangle, same as in Task31
+# Takes in 3 lists, that is points, and a number which indicates the current axis to check
+# Returns True or False
+def WithinRange(PointA, PointB, PointC, i):
+    if int(PointA[i]) >= int(PointB[i]) and int(PointA[i]) <= int(PointC[i]):
+        i = i + 1
+        if i == (len(PointA)): # Base case
+            return True
+        else: # If the point is within the range, call the function again on the next axis
+            return (True and WithinRange(PointA, PointB, PointC, i))
+    else: 
+        return False
+
+# Function to create MinMax lists
+# Input: list of Points
+# Output: List of tuples, first element is the min, second is max
+def CreateMinMax(Points):
+  d = len(Points[0]) # Get the dimension of the space
+  MinMax = []        # Initialise list
+  for i in range(0,d):
+    max = Points[0][i]
+    min = max
+    for j in range(1,len(Points)):
+      if Points[j][i] >= max:
+        max = Points[j][i]
+      if Points[j][i] <= min:
+        min = Points[j][i]    
+    MinMax.append([min,max])
+  return MinMax
+ 
+# Check if two regions intersect
+# Generate minMax lists before, pass it as parameters
+def intersect(minMax1, minMax2):
+    for d in range(0,len(minMax1)):  
+        if not (minMax2[d][0] <= minMax1[d][0] <= minMax2[d][1] or minMax2[d][0] <= minMax1[d][1] <= minMax2[d][1] or minMax1[d][0] <= minMax2[d][0] <= minMax1[d][1] or minMax1[d][0] <= minMax2[d][1] <= minMax1[d][1]):
+            return False
+    return True
+
+
+def SearchKDTree(v,StartPoint, EndPoint,Results):
+    # Check if the node has to be returned
+    if WithinRange(v.getval(),StartPoint,EndPoint,0):
+        Results.append(v.getval())
+    if v.left:
+        List1 = v.left.getoffsprings()
+        MinMax1 = CreateMinMax(List1)
+        List2 = [StartPoint,EndPoint]
+        MinMax2 = CreateMinMax(List2)
+        # Fully contained within goes here                    
+        # Intersect
+        if(intersect(MinMax1,MinMax2)):
+            Results = Results + SearchKDTree(v.left,StartPoint,EndPoint,[])
+    # Other side of the tree
+    if v.right: 
+        List1 = v.right.getoffsprings()
+        MinMax1 = CreateMinMax(List1)
+        List2 = [StartPoint,EndPoint]
+        MinMax2 = CreateMinMax(List2)
+        # Fully contained within goes here                  
+        # Intersect
+        if (intersect(MinMax1,MinMax2)):
+            Results = Results + SearchKDTree(v.right,StartPoint,EndPoint,[])
+    return Results
+
+# Initialisation 
+ListOfPoints = [] # Array for the input numbers
+Nodes = [] # Array to store created nodes
+
+# Read the first line
+FirstLine = sys.stdin.readline()
+info = [int(i) for i in FirstLine.strip().split()]
+NumberOfElements = info[0]
+NumberOfDimensions = info[1]
+NumberOfQueries = info[2]
+
+# Read numbers
+for i in range(0,NumberOfElements):
+    line = sys.stdin.readline()
+    input_point = [int(i) for i in line.strip().split()]
+    Addnewpoint(ListOfPoints,input_point)
+
+# Create tree
+X = BuildKDTree(ListOfPoints,0)
+
+# Read queries
+for i in range(0,NumberOfQueries):
+    # String manipulations
+    line = sys.stdin.readline()
+    line = line.strip()
+    line = line.replace('[','')
+    line = line.replace(']','')
+    input_point = line.split(' ')
+    Start = []
+    for i in range(0,NumberOfDimensions):
+        Start.append(int(input_point[i])) 
+    End = []
+    for i in range(NumberOfDimensions,2*NumberOfDimensions):
+        End.append(int(input_point[i]))
+    # Function call
+    Points = SearchKDTree(X,Start,End,[])
+    for i in Points:
+        print (str(i).replace(',',''),end=" ")
+    print 

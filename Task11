@@ -1,0 +1,37 @@
+import sys
+
+
+# Function definitions
+def Addnewnumbers(ListA, number):
+    ListA.append(number)
+
+
+def Query(ListA, StartingPoint, EndPoint):
+    for element in ListA:
+        if element >= StartingPoint and element <= EndPoint:
+            print(element, end=" ")
+    print
+
+
+# Initialisation
+ListOfIntegers = []  # Array for the input numbers
+
+
+# Read the first line
+FirstLine = sys.stdin.readline()
+info = [int(i) for i in FirstLine.strip().split()]
+NumberOfElements = info[0]
+NumberOfQueries = info[1]
+
+
+# Read numbers
+for i in range(NumberOfElements):
+    line = sys.stdin.readline()
+    input_integer = int(line.strip())
+    Addnewnumbers(ListOfIntegers, input_integer)
+
+# Read queries
+for i in range(NumberOfQueries):
+    line = sys.stdin.readline()
+    input_queries = [int(i) for i in line.strip().split()]
+    Query(ListOfIntegers, input_queries[0], input_queries[1])
