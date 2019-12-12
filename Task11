@@ -2,36 +2,36 @@ import sys
 
 
 # Function definitions
-def Addnewnumbers(ListA, number):
-    ListA.append(number)
+def add_new_numbers(listA, number):
+    listA.append(number)
 
 
-def Query(ListA, StartingPoint, EndPoint):
-    for element in ListA:
-        if element >= StartingPoint and element <= EndPoint:
-            print(element, end=" ")
-    print
+def query(listA, starting_point, end_point, print_res=False):
+    for element in listA:
+        if element >= starting_point and element <= end_point:
+            if print_res:
+                print(element, end=", ")
+            else:
+                yield element
 
 
-# Initialisation
-ListOfIntegers = []  # Array for the input numbers
+if __name__ == "__main__":
+    # Initialisation
+    list_of_integers = []  # Array for the input numbers
 
+    # Read the first line
+    first_line = sys.stdin.readline()
+    info = [int(i) for i in first_line.strip().split()]
+    no_of_elements, no_of_queries = info
 
-# Read the first line
-FirstLine = sys.stdin.readline()
-info = [int(i) for i in FirstLine.strip().split()]
-NumberOfElements = info[0]
-NumberOfQueries = info[1]
+    # Read numbers
+    for i in range(no_of_elements):
+        line = sys.stdin.readline()
+        input_integer = int(line.strip())
+        add_new_numbers(list_of_integers, input_integer)
 
-
-# Read numbers
-for i in range(NumberOfElements):
-    line = sys.stdin.readline()
-    input_integer = int(line.strip())
-    Addnewnumbers(ListOfIntegers, input_integer)
-
-# Read queries
-for i in range(NumberOfQueries):
-    line = sys.stdin.readline()
-    input_queries = [int(i) for i in line.strip().split()]
-    Query(ListOfIntegers, input_queries[0], input_queries[1])
+    # Read queries
+    for i in range(no_of_queries):
+        line = sys.stdin.readline()
+        input_queries = [int(i) for i in line.strip().split()]
+        query(list_of_integers, input_queries[0], input_queries[1])
