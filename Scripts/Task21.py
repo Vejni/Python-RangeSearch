@@ -2,6 +2,7 @@ from bisect import bisect_left
 import sys
 
 nodes = []  # Array to store created nodes
+PRINT_RES = False
 
 
 # Node class definition
@@ -30,7 +31,7 @@ class Node(object):
             return self.right.getrightmost()
 
     # Function to print the LEAF nodes of a node
-    def getleafs(self, print_res=False):
+    def getleafs(self):
         if self.left:
             self.left.getleafs()
         if self.right:
@@ -90,6 +91,7 @@ def create_next_level(listA):
 # if we have an odd number of nodes in the next level,
 # to keep the tree balanced it will iterate through the nodes backwards
 # Returns nothing, but creates the tree structure
+# I know it is not dry but whatever
 def create_next_level_reverse(listA):
     next_level_nodes = []
     if len(listA) % 2 == 1:
@@ -146,37 +148,37 @@ def query(root, start_point, end_point, print_res=False):
                 and PRINT_RES):
             print(v_split.value, end=" ")
             return
-    else:
-        # If not, look at left subtree
-        v = v_split.left
-        while v.left is not None:
-            if start_point <= v.value:
-                v.right.getleafs(print_res)
-                v = v.left
-            else:
-                v = v.right
-        if (v is not None
-                and (v.value >= start_point)
-                and (v.value <= end_point)
-                and PRINT_RES):
-            print(v.value, end=" ")
 
-        # Then at right subtree
-        v = v_split.right
-        while v.left is not None:
-            if end_point >= v.value:
-                if v.left:
-                    v.left.getleafs(print_res)
-                v = v.right
-            else:
-                v = v.left
-        if (v is not None
-                and (v.value >= start_point)
-                and (v.value <= end_point)
-                and PRINT_RES):
-            print(v.value, end=" ")
+    # If not, look at left subtree
+    v = v_split.left
+    while v.left is not None:
+        if start_point <= v.value:
+            v.right.getleafs(print_res)
+            v = v.left
+        else:
+            v = v.right
+    if (v is not None
+            and (v.value >= start_point)
+            and (v.value <= end_point)
+            and PRINT_RES):
+        print(v.value, end=" ")
 
-        return
+    # Then at right subtree
+    v = v_split.right
+    while v.left is not None:
+        if end_point >= v.value:
+            if v.left:
+                v.left.getleafs(print_res)
+            v = v.right
+        else:
+            v = v.left
+    if (v is not None
+            and (v.value >= start_point)
+            and (v.value <= end_point)
+            and PRINT_RES):
+        print(v.value, end=" ")
+
+    return
 
 
 if __name__ == "__main__":
