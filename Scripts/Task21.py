@@ -148,37 +148,37 @@ def query(root, start_point, end_point, print_res=False):
                 and PRINT_RES):
             print(v_split.value, end=" ")
             return
+    else:
+        # If not, look at left subtree
+        v = v_split.left
+        while v.left is not None:
+            if start_point <= v.value:
+                v.right.getleafs()
+                v = v.left
+            else:
+                v = v.right
+        if (v is not None
+                and (v.value >= start_point)
+                and (v.value <= end_point)
+                and PRINT_RES):
+            print(v.value, end=" ")
 
-    # If not, look at left subtree
-    v = v_split.left
-    while v.left is not None:
-        if start_point <= v.value:
-            v.right.getleafs(print_res)
-            v = v.left
-        else:
-            v = v.right
-    if (v is not None
-            and (v.value >= start_point)
-            and (v.value <= end_point)
-            and PRINT_RES):
-        print(v.value, end=" ")
+        # Then at right subtree
+        v = v_split.right
+        while v.left is not None:
+            if end_point >= v.value:
+                if v.left:
+                    v.left.getleafs()
+                v = v.right
+            else:
+                v = v.left
+        if (v is not None
+                and (v.value >= start_point)
+                and (v.value <= end_point)
+                and PRINT_RES):
+            print(v.value, end=" ")
 
-    # Then at right subtree
-    v = v_split.right
-    while v.left is not None:
-        if end_point >= v.value:
-            if v.left:
-                v.left.getleafs(print_res)
-            v = v.right
-        else:
-            v = v.left
-    if (v is not None
-            and (v.value >= start_point)
-            and (v.value <= end_point)
-            and PRINT_RES):
-        print(v.value, end=" ")
-
-    return
+        return
 
 
 if __name__ == "__main__":
@@ -213,3 +213,5 @@ if __name__ == "__main__":
         line = sys.stdin.readline()
         input_queries = [int(i) for i in line.strip().split()]
         query(root, input_queries[0], input_queries[1], True)
+        if PRINT_RES:
+            print("")
