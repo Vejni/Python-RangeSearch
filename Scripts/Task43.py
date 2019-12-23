@@ -55,10 +55,10 @@ def build_kd_tree(P, depth):
     v_left = build_kd_tree(P[:(rounded_middle)], (depth+1))
     v_right = build_kd_tree(P[(rounded_middle+1):], (depth+1))
 
-    MedianPoint = Node(med_value)
-    MedianPoint.left = v_left
-    MedianPoint.right = v_right
-    return MedianPoint
+    median_point = Node(med_value)
+    median_point.left = v_left
+    median_point.right = v_right
+    return median_point
 
 
 if __name__ == "__main__":
@@ -77,7 +77,7 @@ if __name__ == "__main__":
         add_new_point(list_of_points, input_point)
 
     # Create tree
-    X = build_kd_tree(list_of_points, 0)
+    root = build_kd_tree(list_of_points, 0)
 
     # Print tree, depth first order
     Node.print_tree()
